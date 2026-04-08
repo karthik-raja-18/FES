@@ -27,6 +27,7 @@ public class StudentService {
     private final EvaluationRepository evaluationRepository;
 
     // Get all subjects the student is enrolled in
+    @Transactional(readOnly = true)
     public List<StudentSubjectResponse> getEnrolledSubjects(String username) {
         Student student = studentRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Student profile not found for: " + username));
@@ -95,12 +96,16 @@ public class StudentService {
 
         // Attach faculty info
         List<Faculty> faculties = facultySubjectRepository.findFacultyBySubjectId(subject.getId());
-        if (!faculties.isEmpty()) {
+        if (faculties != null && !faculties.isEmpty()) {
             Faculty faculty = faculties.get(0);
-            response.setFacultyId(faculty.getId());
-            response.setFacultyName(faculty.getUser().getFullName());
-            response.setFacultyDepartment(faculty.getDepartment());
-            response.setFacultyDesignation(faculty.getDesignation());
+            if (faculty != null) {
+                response.setFacultyId(faculty.getId());
+                if (faculty.getUser() != null) {
+                    response.setFacultyName(faculty.getUser().getFullName());
+                }
+                response.setFacultyDepartment(faculty.getDepartment());
+                response.setFacultyDesignation(faculty.getDesignation());
+            }
         }
 
         // Check if already evaluated

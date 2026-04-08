@@ -16,10 +16,20 @@ public class LoginPage {
     private final WebDriverWait wait;
 
     // --- Locators ---
-    private final By usernameField = By.xpath("//input[@name='username' or @id='username' or @placeholder='Username']");
-    private final By passwordField = By.xpath("//input[@name='password' or @id='password' or @placeholder='Password']");
-    private final By loginButton   = By.xpath("//button[@type='submit' or contains(text(),'Login') or contains(text(),'Sign In')]");
-    private final By errorMessage  = By.xpath("//*[contains(@class,'error') or contains(@class,'alert')]");
+    private final By usernameField = By.id("username");
+    private final By passwordField = By.id("password");
+    private final By loginButton   = By.id("login-btn");
+    private final By errorMessage  = By.id("login-error-msg");
+    
+    // Role selection buttons - using more flexible selectors
+    private final By adminRoleButton = By.xpath("//button[contains(@id,'role-ADMIN')]");
+    private final By facultyRoleButton = By.xpath("//button[contains(@id,'role-FACULTY')]");
+    private final By studentRoleButton = By.xpath("//button[contains(@id,'role-STUDENT')]");
+    
+    // Alternative role selectors if IDs don't work
+    private final By adminRoleAlt = By.xpath("//button[contains(text(),'Admin')]");
+    private final By facultyRoleAlt = By.xpath("//button[contains(text(),'Faculty')]");
+    private final By studentRoleAlt = By.xpath("//button[contains(text(),'Student')]");
 
     public LoginPage(WebDriver driver, WebDriverWait wait) {
         this.driver = driver;
@@ -31,17 +41,59 @@ public class LoginPage {
         driver.get(baseUrl);
     }
 
-    /** Perform login with given credentials */
+    /** Select role before login */
+    public void selectRole(String role) {
+        switch (role.toUpperCase()) {
+            case "ADMIN":
+                try {
+                    wait.until(ExpectedConditions.elementToBeClickable(adminRoleButton)).click();
+                } catch (Exception e) {
+                    wait.until(ExpectedConditions.elementToBeClickable(adminRoleAlt)).click();
+                }
+                break;
+            case "FACULTY":
+                try {
+                    wait.until(ExpectedConditions.elementToBeClickable(facultyRoleButton)).click();
+                } catch (Exception e) {
+                    wait.until(ExpectedConditions.elementToBeClickable(facultyRoleAlt)).click();
+                }
+                break;
+            case "STUDENT":
+                try {
+                    wait.until(ExpectedConditions.elementToBeClickable(studentRoleButton)).click();
+                } catch (Exception e) {
+                    wait.until(ExpectedConditions.elementToBeClickable(studentRoleAlt)).click();
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown role: " + role);
+        }
+    }
+
+    /** Perform login with given credentials (without role selection) */
     public void login(String username, String password) {
         WebElement user = wait.until(ExpectedConditions.visibilityOfElementLocated(usernameField));
+        WebElement pass = wait.until(ExpectedConditions.visibilityOfElementLocated(passwordField));
+        WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(loginButton));
+
         user.clear();
         user.sendKeys(username);
 
-        WebElement pass = driver.findElement(passwordField);
         pass.clear();
         pass.sendKeys(password);
 
-        driver.findElement(loginButton).click();
+        loginBtn.click();
+    }
+
+    /** Perform login without role selection */
+    public void loginWithoutRole(String username, String password) {
+        login(username, password);
+    }
+
+    /** Perform login with role selection */
+    public void login(String username, String password, String role) {
+        selectRole(role);
+        login(username, password);
     }
 
     /** Check if login error is displayed */

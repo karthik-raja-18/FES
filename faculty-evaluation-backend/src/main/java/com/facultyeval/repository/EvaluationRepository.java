@@ -43,10 +43,7 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     List<Object[]> findRatingDistributionByFacultyId(@Param("facultyId") Long facultyId);
 
     // Check if student already submitted eval for this faculty in this subject
-    @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END FROM Evaluation e " +
-           "WHERE e.student.id = :studentId AND e.subject.id = :subjectId")
-    boolean existsByStudentIdAndSubjectId(@Param("studentId") Long studentId,
-                                          @Param("subjectId") Long subjectId);
+    boolean existsByStudentIdAndSubjectId(Long studentId, Long subjectId);
 
     // Get all evaluations with feedback for a faculty (only non-empty feedback)
     @Query("SELECT e FROM Evaluation e WHERE e.faculty.id = :facultyId AND e.feedback IS NOT NULL AND e.feedback != ''")

@@ -5,6 +5,7 @@ import com.facultyeval.model.StudentEnrollment;
 import com.facultyeval.model.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,8 +23,8 @@ public interface StudentEnrollmentRepository extends JpaRepository<StudentEnroll
     boolean existsByStudentAndSubject(Student student, Subject subject);
 
     @Query("SELECT se FROM StudentEnrollment se WHERE se.student.id = :studentId AND se.active = true")
-    List<StudentEnrollment> findActiveByStudentId(Long studentId);
+    List<StudentEnrollment> findActiveByStudentId(@Param("studentId") Long studentId);
 
     @Query("SELECT se FROM StudentEnrollment se WHERE se.subject.id = :subjectId AND se.active = true")
-    List<StudentEnrollment> findActiveBySubjectId(Long subjectId);
+    List<StudentEnrollment> findActiveBySubjectId(@Param("subjectId") Long subjectId);
 }

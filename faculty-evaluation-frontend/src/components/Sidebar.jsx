@@ -199,7 +199,7 @@ export default function Sidebar({ navItems, role, roleBadgeColor }) {
           {!collapsed && (theme === 'dark' ? 'Light Mode' : 'Dark Mode')}
         </button>
 
-        <button onClick={handleLogout} style={{
+        <button id="logout-btn" onClick={handleLogout} style={{
           width: '100%', padding: collapsed ? '10px 0' : '10px 14px',
           display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start',
           gap: 10, borderRadius: 'var(--radius-sm)',

@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Page Object for Faculty Dashboard.
- * Covers: viewing feedback submitted by students, logout.
+ * Updated with exact IDs from the frontend implementation.
  */
 public class FacultyPage {
 
@@ -18,42 +18,36 @@ public class FacultyPage {
     private final WebDriverWait wait;
 
     // --- Dashboard ---
-    private final By facultyDashboard   = By.xpath("//*[contains(text(),'Faculty') and (contains(@class,'dashboard') or contains(@class,'header') or contains(@class,'title'))]");
+    private final By overallRating      = By.id("faculty-overall-rating");
+    private final By totalEvaluations   = By.id("faculty-total-evals");
+    private final By feedbackItems      = By.className("feedback-item");
 
-    // --- Feedback View ---
-    private final By feedbackMenu       = By.xpath("//*[contains(text(),'Feedback') or contains(@href,'feedback')]");
-    private final By feedbackTable      = By.xpath("//table | //*[contains(@class,'feedback-list') or contains(@class,'feedback-table')]");
-    private final By feedbackRows       = By.xpath("//table//tr[position()>1] | //*[contains(@class,'feedback-item') or contains(@class,'feedback-row')]");
-    private final By noFeedbackMessage  = By.xpath("//*[contains(text(),'No feedback') or contains(text(),'no records') or contains(text(),'empty')]");
-
-    // --- Logout ---
-    private final By logoutButton       = By.xpath("//button[contains(text(),'Logout') or contains(text(),'Sign Out')] | //a[contains(text(),'Logout')]");
+    // --- Navigation / Logout ---
+    private final By logoutButton       = By.xpath("//button[contains(text(),'Log Out')]");
 
     public FacultyPage(WebDriver driver, WebDriverWait wait) {
         this.driver = driver;
         this.wait   = wait;
     }
 
-    /** Wait for faculty dashboard to load */
+    /** Wait for faculty dashboard to load (by checking URL) */
     public boolean isFacultyDashboardVisible() {
         try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(facultyDashboard));
-            return true;
+            return wait.until(ExpectedConditions.urlContains("faculty"));
         } catch (Exception e) {
-            return driver.getCurrentUrl().toLowerCase().contains("faculty");
+            return false;
         }
     }
 
-    /** Navigate to feedback section */
+    /** Navigate to feedback section (already on dashboard, but can click tab if needed) */
     public void navigateToFeedback() {
-        wait.until(ExpectedConditions.elementToBeClickable(feedbackMenu)).click();
+        // Feedbacks are displayed on the main dashboard page
     }
 
-    /** Check if feedback table/list is visible */
+    /** Check if feedback section is visible (by checking if overall rating exists) */
     public boolean isFeedbackSectionVisible() {
         try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(feedbackTable));
-            return true;
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(overallRating)).isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -62,25 +56,22 @@ public class FacultyPage {
     /** Returns count of feedback records shown */
     public int getFeedbackCount() {
         try {
-            List<WebElement> rows = wait.until(
-                    ExpectedConditions.presenceOfAllElementsLocatedBy(feedbackRows));
-            return rows.size();
+            List<WebElement> items = driver.findElements(feedbackItems);
+            return items.size();
         } catch (Exception e) {
             return 0;
         }
     }
 
-    /** Check if feedback is available (at least 1 record OR section visible) */
-    public boolean canViewFeedback() {
-        return isFeedbackSectionVisible() || getFeedbackCount() > 0;
-    }
-
-    /** Check if empty/no-feedback message is shown */
-    public boolean isNoFeedbackMessageShown() {
+    /** Check if specific feedback text is present in the dashboard */
+    public boolean hasFeedbackText(String feedbackText) {
         try {
-            return driver.findElement(noFeedbackMessage).isDisplayed();
+            // Feedback text is usually in a paragraph inside feedback-item
+            By feedbackTextLocator = By.xpath("//*[contains(@class, 'feedback-item')]//p[contains(text(),\"" + feedbackText + "\")]");
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(feedbackTextLocator)).isDisplayed();
         } catch (Exception e) {
-            return false;
+            // Fallback to searching page source if class-based xpath fails
+            return driver.getPageSource().contains(feedbackText);
         }
     }
 

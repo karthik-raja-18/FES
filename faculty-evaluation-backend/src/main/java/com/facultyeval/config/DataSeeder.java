@@ -111,5 +111,44 @@ public class DataSeeder implements CommandLineRunner {
                         .build());
             }
         }
+        // Seed E2E Specific Credentials for Testing
+        if (userRepository.findByUsername("student1").isEmpty()) {
+            User e2eStudent = userRepository.save(User.builder()
+                    .username("student1")
+                    .password(passwordEncoder.encode("student1"))
+                    .fullName("Test Student")
+                    .email("student1@e2e.test")
+                    .role(Role.STUDENT)
+                    .active(true)
+                    .build());
+            
+            studentRepository.save(Student.builder()
+                    .user(e2eStudent)
+                    .rollNumber("E2E001")
+                    .batch("2024")
+                    .program("B.Tech")
+                    .department("Computer Science")
+                    .build());
+            log.info("E2E Student user 'student1' created");
+        }
+
+        if (userRepository.findByUsername("faculty1").isEmpty()) {
+            User e2eFaculty = userRepository.save(User.builder()
+                    .username("faculty1")
+                    .password(passwordEncoder.encode("faculty1"))
+                    .fullName("Test Faculty")
+                    .email("faculty1@e2e.test")
+                    .role(Role.FACULTY)
+                    .active(true)
+                    .build());
+            
+            facultyRepository.save(Faculty.builder()
+                    .user(e2eFaculty)
+                    .department("Computer Science")
+                    .designation("E2E Test Professor")
+                    .employeeId("E2EEMP01")
+                    .build());
+            log.info("E2E Faculty user 'faculty1' created");
+        }
     }
 }

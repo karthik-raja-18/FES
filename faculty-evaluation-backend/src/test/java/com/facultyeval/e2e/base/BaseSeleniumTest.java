@@ -19,7 +19,7 @@ public class BaseSeleniumTest {
     protected WebDriver driver;
     protected WebDriverWait wait;
 
-    protected static final String BASE_URL = "http://localhost:3000";
+    protected static final String BASE_URL = "http://localhost:3000/login";
     protected static final int WAIT_TIMEOUT_SECONDS = 15;
 
     @BeforeMethod

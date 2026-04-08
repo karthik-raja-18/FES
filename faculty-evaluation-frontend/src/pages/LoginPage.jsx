@@ -210,7 +210,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" loading={loading} style={{ width: '100%', height: 48, justifyContent: 'center', marginTop: 8 }}>
+            <Button id="login-btn" type="submit" loading={loading} style={{ width: '100%', height: 48, justifyContent: 'center', marginTop: 8 }}>
               Sign In to Portal
             </Button>
           </form>
